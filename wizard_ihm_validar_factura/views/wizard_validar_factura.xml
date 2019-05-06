@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="wizard_factura_view">
+            <field name="name">wizard.factura.view</field>
+            <field name="model">wizard_val</field>
+            <field name="arch" type="xml">
+                <form string="Factura">
+                    <group>
+                        <field name="xcliente_ids"/>
+                    </group>
+                    <footer>
+<!--                         <button string="Validar Facturas" name="validar_facturas" states="draft" type="object" class="oe_highlight o_invoice_validate" 
+                           groups="account.group_account_invoice" />
+                        <button string="Cancelar" class="btn-default" special="cancel"/> -->
+                        <button string="Validar Facturacion" name="validar_add" type="object" class="oe_highlight"/>
+                        <button string="Cancelar" class="btn-default" special="cancel"/>
+                    </footer>				
+                </form>
+            </field>
+        </record>
+        <act_window
+            id="action_validar_factura"
+            multi="True"
+            key2="client_action_multi"
+            name="Validar Facturas"
+            res_model="wizard_val"
+            src_model="account.invoice"
+            view_mode="form"
+            target="new"/>
+    </data>
+</odoo>
+

@@ -12,63 +12,33 @@ import werkzeug
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    state = fields.Selection([
-        ('draft', 'RFQ'),
-        ('sent', 'RFQ Sent'),
-        ('to approve', 'To Approve'),
-        ('purchase', 'Purchase Order'),
-        ('done', 'Locked'),
-        ('cancel', 'Cancelled')
-    ], string='Status', compute='_cambia_factura', readonly=True, index=True, copy=False, default='draft', track_visibility='onchange')
+    # state = fields.Selection([
+    #     ('draft', 'RFQ'),
+    #     ('sent', 'RFQ Sent'),
+    #     ('to approve', 'To Approve'),
+    #     ('purchase', 'Purchase Order'),
+    #     ('done', 'Locked'),
+    #     ('cancel', 'Cancelled')
+    # ], string='Status', compute='_cambia_factura', readonly=True, index=True, copy=False, default='draft', track_visibility='onchange')
     
 
 
-    @api.multi
-    @api.depends('state')
-    def _cambia_factura(self):
-        print("entrando a validar el usuario oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooddddddmmmmmm")
-        #print(self.state)
-        print(self)
-        #valor =  self.env['purchase.order'].sudo().search([('state','=','purchase'),('invoice_status','=', 'to invoice'),('invoice_count','=',0)])
-       # valor =  self.env['product.list'].sudo().search([('product_list_id','=',self.product_list_id)])
-        valor=len(self)
-        if(valor==1):
-            print(self)
-            print(self.state)
-            valor_state =  self.env['purchase.order'].sudo().search([('state','=','purchase'),('invoice_status','=', 'to invoice'),('invoice_count','=',0)])
+    # @api.one
+    # @api.depends('state')
+    # def _cambia_factura(self):
+    #     print("entrando a validar el usuario oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooddddddmmmmmm")
+    #     #print(self.state)
+    #     print(self)
+    #         #if (self.state == 'purchase'):   
+    #     if (self.state == 'purchase'):
+    #         print("purchase su estado es una orden de compra")
+    #         self.action_view_invoice()               
+                   
 
-            #if (self.state == 'purchase'):   
-            if (valor_state):
-                context = self._context
-                current_uid = context.get('uid')
-                print("buscabdo usuario")
-                user = self.env['res.users'].search([('id','=',current_uid)])
-                print("buscando group")
-                group= self.env['res.groups'].search([('name','=','validacion_director'),('users','=',user.id)]) 
-                print("buscando si existe el suaurio e el grupo")
-                print("user")
-                print(user.id)
-                print(user.name)
-                print(group.id)
-                print(group.name)
-                #encontrar=loop.is_group_admin                   
-                #encontrar= loop.env['res_groups_users_rel'].search([('gid','=',group.id),('uid','=',user.id)]) 
-                           
-                print("user")
-                print(user.id)
-                print(user.name)
-
-
-                if group:
-                    
-                    print("creando factura wiii :D")
-                    #print(valor)
-                    #for fac in valor:
-                    self.action_view_invoice()               
-                    
-
-            else:
-                print("usuario incorrecto")   
+    #     else:
+    #         print("no es purchase")  
+    #     x_status='true'
+    #     print(self.x_status)
 
 
     @api.model
@@ -124,3 +94,7 @@ class PurchaseOrder(models.Model):
             'target': 'self',
             'url':redirect_url
         }
+
+
+
+    # x_status = fields.Char(string='x_status',compute='_cambia_factura')

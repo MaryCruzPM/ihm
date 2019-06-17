@@ -39,7 +39,15 @@ class PurchaseOrder(models.Model):
     #         print("no es purchase")  
     #     x_status='true'
     #     print(self.x_status)
-
+    def _preparar_factura(self, proveedor, origin):
+        """
+        Prepara el diccionario de datos para crear la nueva factura
+    """
+        return {
+            'partner_id':proveedor,
+            #'x_cuenta_analitica':cuenta_analitica,
+            'origin':origin,
+            }
 
     @api.model
     def create(self,vals):
@@ -50,14 +58,60 @@ class PurchaseOrder(models.Model):
                     raise UserError(_('RFQ is available for this purchase agreement for the same vendor'))
         return super(PurchaseOrder, self).create(vals)
 
+
+    def _preparar_linea_factura(self, factura,linea):
+        """
+        Prepara el diccionario de datos para crear las líneas de la nueva orden
+    """
+        return {
+        'invoice_id':factura.id,
+        'product_id':linea.product_id.id,
+        'name':linea.name,
+        'origin':factura.name,
+        'account_id':linea.product_id.categ_id.property_account_income_categ_id.id,
+        'price_unit': linea.price_unit,
+        'uom_id': linea.product_id.uom_id.id,
+        'type':'in_invoice',
+        #'account_id': 40,
+       
+        }
+
     @api.multi
     def write(self, vals):
+        context = self._context # para saber que usuario esta en sesion
+        current_uid = context.get('uid')
+        user = self.env['res.users'].search([('id','=',current_uid)])
+        group= self.env['res.groups'].search([('name','=','validacion_director'),('users','=',user.id)]) 
+        #
         if vals.get('partner_id') or vals.get('requisition_id'):
             purchase_ids = self.env['purchase.order'].search([('requisition_id', '=', vals.get('requisition_id'))])
             for po_id in purchase_ids:
                 if vals.get('partner_id') == po_id.partner_id.id:
                     raise UserError(_('RFQ is available for this purchase agreement for the same vendor'))
-        return super(PurchaseOrder, self).write(vals)
+        print("creando purchase")            
+        purchase_actual=super(PurchaseOrder, self).write(vals)                   
+        keys=vals.keys()
+        values=vals.values()
+        print(keys)
+        print(values)
+        if (('state' in keys)& ('purchase' in values)):
+            if(group):                
+                print("la self su estado es =  purchase")
+                factura_obj = self.env['account.invoice']
+                print("factura data")
+                print(self.name)
+                factura_data = self._preparar_factura(self.partner_id.id, self.name)
+                print("hola")
+                factura_crear = factura_obj.create(factura_data)
+                print("se creo la factura")
+                for valor in self.order_line:
+                    linea_obj = self.env['account.invoice.line']
+                    linea_data = self._preparar_linea_factura(factura_crear, valor)
+                    linea_crear = linea_obj.create(linea_data)
+                    #return super(PurchaseOrder, self).write(vals)
+                factura_crear.type='in_invoice'
+                return purchase_actual
+        return purchase_actual   #super(PurchaseOrder, self).write(vals)
 
     @api.multi
     def compare_purchase_orders(self):

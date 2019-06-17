@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record model="ir.ui.view" id="estatus_rfq_view">
+			<field name="name">estatus.rfq.view</field>
+			<field name="model">purchase.order</field>
+			<field name="inherit_id" ref="purchase.purchase_order_form"></field>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='date_order']" position="after">
+					<field name="type" string="Estatus"/>
+					<field name="campo_ejecucion" invisible='1'/>
+				</xpath>
+				<xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="before">
+					<field name="x_prioridad"/>
+				</xpath>
+			</field>
+		</record>
+		<record model='ir.ui.view' id='purchase_order_aprobada_tree'>
+			<field name='name'>purchase.order.aprobada.tree</field>
+			<field name='model'>purchase.order</field>
+			<field name="inherit_id" ref="purchase.purchase_order_tree"/>
+			<field name='arch' type='xml'>
+				<xpath expr="//field[@name='partner_id']" position="after">
+					<field name="type" string="Estatus"/>
+				</xpath>
+			</field>
+		</record>
+	</data>
+</odoo>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record id="view_transfer_product_quantity" model="ir.ui.view">
+            <field name="name">Transferir Productos</field>
+            <field name="model">stock.quant.transfer</field>
+            <field name="arch" type="xml">
+                <form string="Transferir Productos">
+                    <group>
+                        <field name="product_id"/>
+                        <field name="qty"/>
+                        <field name="location_id" groups="stock.group_stock_multi_locations"/>
+                        <field name="location_dest_id" groups="stock.group_stock_multi_locations"/>
+                    </group>
+                    <footer>
+                        <button name="transfer_product_qty" string="Transferir" type="object" class="btn-primary"/>
+                        <button string="_Cancel" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+	</data>
+</odoo>

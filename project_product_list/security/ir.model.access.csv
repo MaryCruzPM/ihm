@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+product_list_base,product_list_base_group,model_product_list,base.group_user,1,0,0,0
+product_list_line_base,product_list_line_base_group,model_product_list_line,base.group_user,1,0,0,0
+product_list_manager,product_list_project_manager,model_product_list,project.group_project_manager,1,1,1,1
+product_list_line_manager,product_list_line_project_manager,model_product_list_line,project.group_project_manager,1,1,1,1

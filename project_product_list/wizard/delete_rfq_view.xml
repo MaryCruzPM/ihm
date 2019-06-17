@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record model="ir.ui.view" id="delete_rfq_view_form">
+			<field name="name">delete.rfq.view.form</field>
+			<field name="model">wizard.delete_rfq</field>
+			<field name="arch" type="xml">
+				<form string="Procesar RFQ's">
+					<group>
+						<field name="purchase_ids"/>
+					</group>
+					<footer>
+						<button string="Eliminar RFQ's" name="delete_rfqs" type="object" class="oe_highlight"/>
+						<button name="rfqs_noaprobada" string="Marcar como No Aprobadas" type="object" class="oe_highlight"/>
+						<button string="Cancelar" class="btn-default" special="cancel"/>
+					</footer>
+				</form>
+			</field>
+		</record>
+		<act_window id="action_delete_rfq" multi="True" key2="client_action_multi" name="Procesar RFQ's No Aprobadas" res_model="wizard.delete_rfq" src_model="purchase.order" view_mode="form" target="new"/>
+	</data>
+</odoo>

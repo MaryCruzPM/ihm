@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record model="ir.ui.view" id="product_list_form">
+			<field name="name">product.list.form</field>
+			<field name="model">product.list</field>
+			<field name="arch" type="xml">
+				<form string="Lista de Productos">
+					<header>
+						<field name="is_locked" invisible="1"/>
+						<button name="set_confirm" type="object" string="Confirmar" class="oe_highlight" states="draft"/>
+						<button name="set_draft" type="object" string="Revisar Lista" class="oe_highlight" states="confirmed"/>
+						<button name="set_done" type="object" string="Validar" class="oe_highlight" attrs="{'invisible':['|',('state','not in','confirmed')] }"></button>
+						<button name="generar_orden_compra" string="Generar RFQ" type="object" class="oe_highlight" attrs="{'invisible':['|',('state','not in','done'), ('field_bool','=',True)] }"/>
+						<button name="procesar_compras" string="Procesar RFQ" type="object" class="oe_highlight" attrs="{'invisible':['|',('state','not in','purchase')]}"/>
+						<field name="state" widget="statusbar" statusbar_colors='{"borrados":"red","hecho":"blue"}'/>
+					</header>
+					<sheet>
+						<group>
+							<group>
+								<field name="name"/>
+								<field name="project_id" options="{'no_create': True, 'no_open': True}"/>
+								<field name="field_bool" invisible="1"/>
+							</group>
+							<group>
+								<field name="date"/>
+								<field name="type" string="Prioridad"/>
+							</group>
+						</group>
+						<notebook>
+							<page string="Productos">
+								<field name="product_list_ids" attrs="{'readonly': ['|', 
+									('state', 'in', ('confirmed', 'done','purchase')), ('is_locked', '=', False)]}">
+									<tree string="Productos" editable="bottom">
+										<field name="state" invisible="1" readonly="0"/>
+										<field name="type"/>
+										<field name="product"/>
+										<field name="name"/>
+										<field name="fecha"/>
+										<field name="cantidad"/>
+										<field name="uom_lista"/>
+										<field name="project_id" invisible="1"/>
+										<field name="task_id" domain="[('project_id', '=', project_id)]"/>
+									</tree>
+								</field>
+							</page>
+						</notebook>
+					</sheet>
+					<div class="oe_chatter">
+	                    <field name="message_follower_ids" widget="mail_followers"/>
+	                    <field name="activity_ids" widget="mail_activity"/>
+	                    <field name="message_ids" widget="mail_thread"/>
+	                </div>
+				</form>
+			</field>
+		</record>
+		<record model='ir.ui.view' id='product_list_tree'>
+			<field name='name'>product.list.tree</field>
+			<field name='model'>product.list</field>
+			<field name='arch' type='xml'>
+				<tree>
+					<field name="name"/>
+					<field name='project_id'/>
+					<field name="type" string="Prioridad"/>
+					<field name="date"/>
+				</tree>
+			</field>
+		</record>
+		<record id="product_list_search" model="ir.ui.view">
+		    <field name="name">product.list.search</field>
+		    <field name="model">product.list</field>
+		    <field name="arch" type="xml">
+		        <search string="String">
+		            <field name="project_id"/>
+		        </search>
+		    </field>
+		</record>
+		<record id="product_list_action" model="ir.actions.act_window">
+			<field name="name">Lista de Productos</field>
+			<field name="res_model">product.list</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="context">{
+                'search_default_project_id': [active_id],
+                'default_project_id': active_id,
+            }</field>
+		</record>
+		<record model="ir.ui.view" id="project_edit_form">
+			<field name="name">project.edit.form</field>
+			<field name="model">project.project</field>
+			<field name="inherit_id" ref="project.edit_project"/>
+			<field name="arch" type="xml">
+				<xpath expr="//button[@name='attachment_tree_view']" position="before">
+					<button name="%(product_list_action)d" class="oe_stat_button" type="action" icon="fa-list-alt">
+						<field string="Requisiciones" name="product_list_count" widget="statinfo"/>
+					</button>
+				</xpath>
+			</field>
+		</record>
+		<!--menuitem id="product_list_menu" name="Productos" parent="project.menu_main_pm" action="product_list_action"/-->
+	</data>
+</odoo>

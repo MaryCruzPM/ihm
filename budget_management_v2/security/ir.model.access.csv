@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+,,,,,,,
+,,,,,,,
+product_list_manager_access,product.list,model_product_list,project.group_project_manager,1,1,1,1
+,,,,,,,
+product_qty_budget_access,qty.budget,model_qty_budget,project.group_project_manager,1,1,1,1
+product_pagos_efectivo_access,pagos.efectivo,model_pagos_efectivo,project.group_project_manager,1,1,1,1

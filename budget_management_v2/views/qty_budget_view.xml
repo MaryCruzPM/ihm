@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="qty_budget_form_view" model="ir.ui.view">
+            <field name="name">qty.budget.form</field>
+            <field name="model">qty.budget</field>
+            <field name="arch" type="xml">
+                <form string="Budget Quantity">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"  required="1" domain="[('id', 'not in', product_list_ids or False)]"/>                               
+                                <field name="category_id" readonly="1" />
+                                <field name="product_list_ids" invisible="1">
+                                    <tree string="Answers">
+                                        <field name="id"/>
+                                    </tree>
+                                </field>                                        
+                                <field name="qty" />
+                                <field name="uom_id" />
+                                <field name="cantidad_total" groups="base.group_system"/>
+                            </group>
+                            <group>
+                                <field name="executed" readonly="1" />
+                                <field name="executed_cost" readonly="1" groups="base.group_system"/>
+                                <field name="percentage_qty" readonly="1" />
+                                <field name="percentage_amt" readonly="1" groups="base.group_system"/>
+                                <field name="remaining_amt" readonly="1" groups="base.group_system"/>
+                                <field name="remaining_qty" readonly="1" />
+                                <field name="project_id" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="qty_budget_tree_view" model="ir.ui.view">
+            <field name="name">qty.budget.tree</field>
+            <field name="model">qty.budget</field>
+            <field name="arch" type="xml">
+                <tree string="Budget Quantity" >
+                    
+                    
+                    <field name="category_id" readonly="1" />
+                    <field name="name"  required="1" domain="[('id', 'in', product_list_ids and product_list_ids[0][2] or False)]"/>
+                    <field name="product_list_ids" invisible="1">
+                    </field>  
+                                
+                    <field name="qty" sum="total"/>
+                    <field name="uom_id" />
+                    <field name="cantidad_total" groups="base.group_system" sum="total"/>
+                    <field name="executed" readonly="1"  sum="total"/>
+                    <field name="executed_cost" readonly="1" groups="base.group_system" sum="total"/>
+                    <field name="percentage_qty" readonly="1"  sum="total"/>
+                    <field name="percentage_amt" readonly="1" groups="base.group_system" sum="total"/>
+                    <field name="remaining_amt" readonly="1" groups="base.group_system" sum="total"/>
+                    <field name="remaining_qty" readonly="1"  sum="total"/>
+                    <field name="project_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="product_list_search" model="ir.ui.view">
+            <field name="name">qty.budget.search</field>
+            <field name="model">qty.budget</field>
+            <field name="arch" type="xml">
+                <search string="String">
+                    <field name="project_id"/>
+                </search>
+            </field>
+        </record>
+        <!-- <record id="action_qty_budget_view" model="ir.actions.act_window">
+            <field name="name">Budget Quantity</field>
+            <field name="res_model">qty.budget</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{         
+                'search_default_project_id': [active_id],
+                'default_project_id': active_id,
+            }</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Enter the details, the first step of a Budget Quantity.
+                </p>
+            </field>
+        </record> -->
+        
+        <record id="action_qty_budget_view" model="ir.actions.act_window">
+            <field name="name">Quantity</field>
+            <field name="res_model">qty.budget</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{
+                                  'search_default_project_id': [active_id], 
+                                  'default_project_id': active_id,
+                                  'group_by':'category_id'
+                                  
+                                  }</field>
+        </record>
+        <!-- 
+        <record id="edit_accpunt_invoice_inherit" model="ir.ui.view">
+        <field name="name">account.invoice.edit.inherit</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form" />
+        <field name="arch" type="xml">
+            <data>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="project_acc_id" invisible="1"/>
+            </xpath>
+            </data>
+        </field>
+    </record> -->
+    
+    <record id="view_qty_budget_group" model="ir.ui.view">
+            <field name="name">qty.budget</field>
+            <field name="model">qty.budget</field>
+            <field name="arch" type="xml">
+                <search string="Budget">
+                    <field name="project_id"/>
+                    <field name="category_id"/>
+                   <separator/>
+                    <group expand="0" string="Group By...">
+                        <filter name="category_id" string="Category" context="{'group_by':'category_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>
+        

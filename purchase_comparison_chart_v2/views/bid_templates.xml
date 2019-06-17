@@ -1,0 +1,490 @@
+<odoo>
+    <data>
+
+        <template id="assets_frontend_result1"
+            inherit_id="website.assets_frontend"
+            name="Purchase Terms and Condition">
+            <xpath expr="." position="inside">
+                <script type="text/javascript"
+                    src="/purchase_comparison_chart/static/src/js/validate_bid.js" />
+                <script type="text/javascript"
+                    src="/purchase_comparison_chart/static/src/js/purchase_comparision.js" />
+                <!-- <script src="https://code.jquery.com/jquery-3.3.1.js"></script> -->
+                <link
+                    href="/purchase_comparison_chart/static/src/css/validate_bid.css"
+                    rel="stylesheet" type="text/css">
+                </link>
+            </xpath>
+        </template>
+
+        <template id="purchase_comparison"
+            name="Purchase Comparison Chart">
+            <t t-call="website.layout">
+                <style>
+                    footer{display:none !important;}
+                </style>
+                <div class="wrap">
+                    <div class="wrap">
+                        <div class="container">
+                            <br />
+                            <div t-ignore="true" class="pull-right">
+                                <t t-if="purchase_requisition_id"><a
+                                    t-attf-href="/web#view_type=form&amp;model=purchase.requisition&amp;id=#{purchase_requisition_id.id}&amp;action=purchase_requisition.action_purchase_requisition"
+                                    class="btn btn-default bk_butn">Back to Purchase Requisition</a>
+                                </t>
+                            </div>
+                            <div id="myModal" class="modal">
+                                <!-- Modal content -->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <span class="close">&amp;times;</span>
+                                        <h2>Notes</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p id="my_vals">
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <form action="/create_purchase_order" method="post" id="purchase_comparision_from">
+                                <div style="float:left">
+                                    <table>
+                                        <tr>
+                                            <th>
+                                                PRC No
+                                                <td style="font-weight:bold;">:</td>
+                                                <td>
+                                                    <span t-field="purchase_requisition_id.name" />
+                                                </td>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                Date
+                                                <td style="font-weight:bold;">:</td>
+                                                <td>
+                                                    <span t-field="purchase_requisition_id.ordering_date" />
+                                                </td>
+                                            </th>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div>
+                                    <h2 style="text-align: center;font-weight: normal;">Purchase Comparison Chart</h2>
+                                </div>
+                                <br />
+                                <br />
+                                <!-- Product and its details -->
+
+                                <div class="pdiv1" style="width:100%;overflow-x:auto;">
+                                    <table style="width: 100%;">
+                                        <thead>
+                                            <tr class="table_tr1 success">
+                                                <th colspan="4" style="text-align:center"
+                                                    class="table_td">Proveedor
+                                                </th>
+                                                <t t-foreach="supplier" t-as="name">
+                                                    <th class="table_th" colspan="2">
+                                                        <span t-esc="name['sname']" />
+                                                        <input type="radio" name="box" id="supplier"
+                                                            t-attf-class="supplier supplier_{{name['supplier_id']}}"></input>
+                                                        <input type="hidden"
+                                                            t-att-value="name['supplier_id']" />
+                                                    </th>
+                                                </t>
+                                            </tr>
+                                            <tr class="new_row">
+                                                <th class="table_td">S#</th>
+                                                <th class="table_td">Material</th>
+                                                <th class="table_td">UM</th>
+                                                <th class="table_td">CANT</th>
+                                                <t t-foreach="number" t-as="num">
+                                                    <th class="table_td">
+                                                        P.Unitario
+                                                    </th>
+                                                    <th class="table_td">Importe</th>
+                                                </t>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="sale_tbody">
+                                            <t t-set="i" t-value="1" />
+                                            <t t-foreach="data" t-as="question">
+                                                <tr class="row2">
+                                                    <td class="table_td">
+                                                        <span t-esc="i" />
+                                                    </td>
+                                                    <td
+                                                        style="border:solid #d1cfcf 1px;padding:5px;line-height: 13px;">
+                                                        <span t-esc="question['product_name']" />
+                                                    </td>
+                                                    <td class="table_td">
+                                                        <span t-esc="question['uom']" />
+                                                    </td>
+                                                    <td class="table_td">
+                                                        <span t-esc="question['qty']" />
+                                                    </td>
+                                                    <t t-foreach="question['amt']" t-as="amount">
+                                                        <td class="table_td">
+                                                            <t t-if="amount['price'] != 0.0 and amount['price'] != '0.00'">
+                                                                <t t-if="amount['price']==question['min_amount']">
+                                                                    <b t-esc="amount['price']" style='color:#004000'/>
+                                                                </t>
+                                                                <t t-if="amount['price']==question['max_amount'] and amount['price']!=question['min_amount']">
+                                                                    <b t-esc="amount['price']"  style='color:#631919' />
+                                                                </t>
+                                                                <t t-if="amount['price']!=question['max_amount'] and amount['price']!=question['min_amount']">
+                                                                    <b t-esc="amount['price']" />
+                                                                </t> 
+                                                                
+                                                                <input type="radio"
+                                                                    t-attf-name="radio_{{amount['product_id']}}"
+                                                                    t-attf-value="radio_{{amount['supplier_id']}}_{{amount['purchase_order_id']}}_{{amount['po_line']}}"
+                                                                    t-attf-class="supplier_product_{{amount['supplier_id']}}"></input>
+                                                            </t>
+                                                        </td>
+                                                        <td class="table_td">
+                                                            <t t-if="amount['total_amount'] != 0.0 and amount['total_amount'] != '0.00'">
+                                                                <b t-esc="amount['total_amount']" />
+                                                            </t>
+                                                        </td>
+                                                    </t>
+                                                    <t t-set="i" t-value="i+1" />
+                                                </tr>
+                                            </t>
+                                            <tr>
+                                                <th colspan="4" class="total_row">Total</th>
+                                                <t t-foreach="to_no" t-as="number">
+                                                    <t t-if="number in column_no">
+                                                        <td style="padding:15px 0px;border:solid #d1cfcf 1px;">
+                                                            <span t-esc="supplier_amount_total_1[number-1]" />
+                                                        </td>
+                                                    </t>
+                                                    <t t-if="number in odd_number">
+                                                        <td>
+                                                            
+                                                        </td>
+                                                    </t>
+                                                </t>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                        <div class="col-md-12" >
+                                            <input type="submit" style="margin-top:30px;" value="Confirm Orders" class="btn btn-primary pull-right confirm_order" />
+                                        </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+
+
+
+        <template id="purchase_comparison_list"
+            name="Purchase Comparison Chart">
+            <t t-call="website.layout">
+                <style>
+                    footer{display:none !important;}
+                </style>
+                <div class="wrap">
+                    <div class="wrap">
+                        <div class="container">
+                            <br />
+                            <t t-if="po==0">
+                            <div t-ignore="true" class="pull-right">
+                                <a
+                                    t-attf-href="/web#view_type=form&amp;model=product.list&amp;id=#{list_id.id}&amp;active_id=#{list_id.project_id.id}&amp;action=project_product_list.product_list_action"
+                                    class="btn btn-default bk_butn">Back to Product List</a>
+                            </div> 
+                            </t>
+                            <div id="myModal" class="modal">
+                                <!-- Modal content -->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <span class="close">&amp;times;</span>
+                                        <h2>Notes</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p id="my_vals">
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <form action="/create_purchase_order" method="post" id="purchase_comparision_from">
+                                <div style="float:left">
+                                <t t-if="po==0">
+                                    <table>
+                                        <tr>
+                                            <th style="font-weight:normal;">
+                                                PRC No
+                                                <td style="font-weight:bold;">:</td>
+                                                <td>
+                                                    <span t-field="list_id.name" />
+                                                </td>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th style="font-weight:normal;">
+                                                Date
+                                                <td style="font-weight:bold;">:</td>
+                                                <td>
+                                                    <span t-field="list_id.date" />
+                                                </td>
+                                            </th>
+                                        </tr> 
+                                    </table>
+                                </t>
+                                </div>
+                                <div>
+                                    <h2 style="text-align: center;">Purchase Comparison Chart</h2>
+                                </div>
+                                <br />
+                                <br />
+                                <!-- Product and its details -->
+
+                                <div class="pdiv1" style="width:100%;overflow-x:auto;">
+                                    <table style="width: 100%;">
+                                        <thead>
+                                            <tr class="table_tr1 success">
+                                                <th colspan="4" style="text-align:center"
+                                                    class="table_td fixed_columns column1">Proveedor
+                                                </th>
+                                                <t t-if="po==0">
+                                                     <th colspan="2" style="text-align:center"
+                                                        class="table_td fixed_columns column5 ">Planned Budget
+                                                    </th> 
+                                                    <th colspan="2" style="text-align:center"
+                                                        class="table_td fixed_columns column7 ">Executed
+                                                    </th>
+                                                    <th colspan="2" style="text-align:center"
+                                                        class="table_td fixed_columns  column9 ">New Executed
+                                                    </th>
+                                                </t>
+                                                <t t-foreach="supplier" t-as="name">
+                                                    <th class="table_th col_new" colspan="2">
+                                                        <span t-esc="name['sname']" />
+                                                        <input type="radio" name="box" id="supplier"
+                                                    t-attf-class="totradio supplier supplier_{{name['supplier_id']}}"></input>
+                                                        <input type="hidden"
+                                                            t-att-value="name['supplier_id']" />
+                                                    </th>
+                                                </t>
+                                            </tr>
+                                            <tr class="new_row">
+                                                <th class="table_td fixed_columns column1">S#</th>
+                                                <th class="table_td fixed_columns column2">Material</th>
+                                                <th class="table_td fixed_columns column3">UM</th>
+                                                <th class="table_td fixed_columns column4">CANT</th>
+                                                <t t-if="po==0">
+                                                    <th class="table_td fixed_columns column5 color_pick">Cant</th>
+                                                    <th class="table_td fixed_columns column6 color_pick">Importe</th>
+                                                    <th class="table_td fixed_columns column7 color_pick1">Cant</th>
+                                                    <th class="table_td fixed_columns column8 color_pick1">Importe</th>
+                                                    <th class="table_td fixed_columns column9 color_pick2">Cant</th>
+                                                    <th class="table_td fixed_columns column10 color_pick2">Importe</th>
+                                                </t>
+                                                <t t-foreach="number" t-as="num">
+                                                    <th class="table_td col_new">
+                                                        P.Unitario
+                                                    </th>
+                                                    <th class="table_td">Importe</th>
+                                                </t>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="sale_tbody">
+                                            <t t-set="i" t-value="1" />
+                                            <t t-foreach="data" t-as="question">
+                                                <tr class="row2">
+                                                    <td class="table_td  fixed_columns column1">
+                                                        <span t-esc="i" />
+                                                    </td>
+                                                    <td class=" fixed_columns column2"
+                                                        style="border:solid #d1cfcf 1px;padding:5px;line-height: 13px;">
+                                                        <span t-esc="question['product_name']" />
+                                                    </td>
+                                                    <td class="table_td fixed_columns column3">
+                                                        <span t-esc="question['uom']" />
+                                                    </td>
+                                                    <td class="table_td fixed_columns column4">
+                                                        <span t-esc="question['qty']" class="current_qty" />
+                                                    </td>
+                                                    <t t-if="po==0">
+                                                      <td class="table_td fixed_columns color_pick column5  ">    
+                                                            <span t-esc="question['planned_bud']" />                                                
+                                                        </td>
+                                                        <td class="table_td fixed_columns color_pick column6 ">    
+                                                            <span t-esc="question['planned_qty']" />                                                
+                                                        </td>
+                                                        
+                                                        <td class="table_td fixed_columns color_pick1 column7 ">
+                                                            <span t-esc="question['exe_qty']" />                                                
+                                                        </td>
+                                                        <td class="table_td fixed_columns color_pick1 column8 ">    
+                                                            <span t-esc="question['exe_bud']" />                                                
+                                                        </td>
+                                                        
+                                                        
+                                                        <td class="table_td fixed_columns color_pick2 column9 ">
+                                                            <span t-esc="question['new_exe_qty']" />                                                
+                                                        </td>
+                                                        <td class="table_td fixed_columns color_pick2 column10 ">    
+                                                            <span class="new_exe_budget" t-attf-initial_value="{{ question['exe_bud'] }}"  />                                                
+                                                        </td>
+                                                    </t>
+                                                    <t t-foreach="question['amt']" t-as="amount">
+                                                        <td class="table_td col_new">
+                                                            <t t-if="amount['price'] != 0.0 and amount['price'] != '0.00'">
+                                                            
+                                                                <t t-if="amount['price']==question['min_amount']">
+                                                                    <b t-esc="amount['price']" style='color:#00a09d' class="exe_price" t-attf-initial_value="{{ amount['price'] }}" /><br />
+                                                                </t>
+                                                                <t t-if="amount['price']==question['max_amount'] and amount['price']!=question['min_amount']">
+                                                                    <b t-esc="amount['price']"  style='color:#b51111' class="exe_price" t-attf-initial_value="{{ amount['price'] }}"  /><br />
+                                                                </t>
+                                                                <t t-if="amount['price']!=question['max_amount'] and amount['price']!=question['min_amount']">
+                                                                    <b t-esc="amount['price']"  class="exe_price" t-attf-initial_value="{{ amount['price'] }}"  /><br />
+                                                                </t> 
+                                                                
+                                                                <input type="radio" 
+                                                                t-attf-name="radio_{{amount['product_id']}}"
+                                                                t-attf-value="radio_{{amount['supplier_id']}}_{{amount['purchase_order_id']}}_{{amount['po_line']}}"
+                                                                t-attf-class="exe_radio supplier_product_{{amount['supplier_id']}}"></input>
+                                                            </t>
+                                                        </td>
+                                                        <td class="table_td">                                                           
+                                                            <t t-if="amount['total_amount'] != 0.0 and amount['total_amount'] != '0.00'">
+                                                                <b t-esc="amount['total_amount']" /><br /><input type="radio" style="visibility:hidden;"/>
+                                                            </t>
+                                                        </td>
+                                                    </t>
+                                                    <t t-set="i" t-value="i+1" />
+                                                </tr>
+                                            </t>
+                                            <tr>
+                                                <th colspan="4" class="total_row  fixed_columns column1">Total</th>
+                                                <t t-if="po==0">
+                                                    <td style="padding:15px;border:solid #d1cfcf 1px;text-align:center" class=" fixed_columns column5 color_pick"></td>
+                                                    <td style="padding:15px;border:solid #d1cfcf 1px;text-align:center" class=" fixed_columns column6 color_pick"></td>
+                                                    <td style="padding:15px;border:solid #d1cfcf 1px;text-align:center" class=" fixed_columns column7 color_pick1"></td>                                        
+                                                    <td style="padding:15px;border:solid #d1cfcf 1px;text-align:center" class=" fixed_columns column8 color_pick1"></td>
+                                                    <td style="padding:15px;border:solid #d1cfcf 1px;text-align:center" class=" fixed_columns column9 color_pick2"></td>
+                                                    <td style="padding:15px;border:solid #d1cfcf 1px;text-align:center" class=" fixed_columns column10 color_pick2"></td>
+                                                </t>
+                                                <t t-foreach="to_no" t-as="number">
+                                                    <t t-if="number in column_no">
+                                                        <td style="padding:15px;border:solid #d1cfcf 1px;text-align:center" class="col_new">
+                                                            
+                                                            <t t-if="supplier_amount_total_1[number-1] != 0.0 and supplier_amount_total_1[number-1] != '0.00'">
+                                                                <b t-esc="supplier_amount_total_1[number-1]" />
+                                                            </t>
+                                                            
+                                                        </td>
+                                                    </t>
+                                                    <t t-if="number in odd_number">
+                                                        <td
+                                                            style="text-align:center;padding:15px;border:solid #d1cfcf 1px;">
+                                                            
+                                                        </td>
+                                                    </t>
+                                                </t>
+                                            </tr>
+                                        </tbody>
+                                    </table>    
+                                    
+                                
+                                </div>
+                                        <div class="col-md-12" >
+                                            <input type="submit" style="margin-top:30px;" value="Confirm Orders" class="btn btn-primary pull-right confirm_order" />
+                                        </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+
+        <template id="purchase_comparison_confirm"
+            name="Purchase Comparison Chart Confirm">
+            <t t-call="website.layout">
+                
+                <div class="wrap">
+                    <div class="wrap">
+                        <div class="container">
+                            <br />
+                            <t t-if="requisition_id">
+                                <div class="alert alert-warning">
+                                    <strong>Success!</strong> Purchase order processed succesfully.
+
+                                </div>
+                                <div t-ignore="true" class="pull-right">
+                                <a
+                                    t-attf-href="/web#view_type=form&amp;model=purchase.requisition&amp;id=#{requisition_id.id}&amp;action=purchase_requisition.action_purchase_requisition"
+                                    class="btn btn-default bk_butn">Back to Purchase Requisition</a>
+                                    
+                            </div>
+
+                            </t>
+                            <t t-if="not requisition_id">
+                                <div class="alert alert-warning">
+                                    <strong>Success!</strong> Purchase order processed succesfully.
+
+                                </div>
+
+
+                            </t>
+                            
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+
+        <template id="purchase_comparison_list_confirm"
+            name="Purchase Comparison Chart Confirm">
+            <t t-call="website.layout">
+                
+                <div class="wrap">
+                    <div class="wrap">
+                        <div class="container">
+                            <br />
+                             <!-- <t t-if="list_id"> -->
+                                <div class="alert alert-warning">
+                                    <strong>Success!</strong> Purchase order processed succesfully.
+
+                                </div>
+                                <t t-if="list_id!=0">
+                                <div t-ignore="true" class="pull-right">
+                                
+                                <a
+                                    t-attf-href="/web#view_type=form&amp;model=product.list&amp;id=#{list_id.id}&amp;active_id=#{list_id.project_id.id}&amp;action=project_product_list.product_list_action"
+                                    class="btn btn-default bk_butn">Back to Product List</a>
+                                
+                            </div>
+                            </t>
+
+                            <!-- </t>  -->
+                            <!-- <t t-if="not list_id">
+                                <div class="alert alert-success">
+                                          <strong>Warning!</strong> Error in process.
+
+
+                                        </div>
+
+
+                            </t> -->
+                            
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>

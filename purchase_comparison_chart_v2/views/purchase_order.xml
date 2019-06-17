@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		
+
+
+        <record id="purchase_comparision_view" model="ir.ui.view">
+            <field name="name">purchase.order.compare.confirm.form</field>
+            <field name="model">purchase.order.compare.confirm</field>
+            <field name="arch" type="xml">
+                <form string="Compare Purchase Orders">
+                    <h2 class="oe_grey">
+                        Click compare button to view comparision chart
+                    </h2>
+                    <footer>
+                        <button string="Compare Purchase Orders" name="compare_purchase_orders" type="object" default_focus="1" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+<!-- 
+        <act_window id="action_purchase_comparision"
+            multi="True"
+            key2="client_action_multi" name="Purchase Comparision"
+            res_model="purchase.order.compare.confirm" src_model="purchase.order"
+            view_mode="form" target="new" view_type="form" /> -->
+             
+            
+ <record id="action_purchase_comparision" model="ir.actions.server">
+   <field name="name">Purchase Comparison</field>
+   <field name="type">ir.actions.server</field>
+   <field name="model_id" ref="purchase_comparison_chart_v2.model_purchase_order" />
+   <field name="state">code</field>
+   <field name="code">
+    if record:
+    action = record.compare_purchase_orders()
+   </field>
+  </record>
+  
+		
+	</data>
+</odoo>

@@ -12,33 +12,7 @@ import werkzeug
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    # state = fields.Selection([
-    #     ('draft', 'RFQ'),
-    #     ('sent', 'RFQ Sent'),
-    #     ('to approve', 'To Approve'),
-    #     ('purchase', 'Purchase Order'),
-    #     ('done', 'Locked'),
-    #     ('cancel', 'Cancelled')
-    # ], string='Status', compute='_cambia_factura', readonly=True, index=True, copy=False, default='draft', track_visibility='onchange')
     
-
-
-    # @api.one
-    # @api.depends('state')
-    # def _cambia_factura(self):
-    #     print("entrando a validar el usuario oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooddddddmmmmmm")
-    #     #print(self.state)
-    #     print(self)
-    #         #if (self.state == 'purchase'):   
-    #     if (self.state == 'purchase'):
-    #         print("purchase su estado es una orden de compra")
-    #         self.action_view_invoice()               
-                   
-
-    #     else:
-    #         print("no es purchase")  
-    #     x_status='true'
-    #     print(self.x_status)
     def _preparar_factura(self, proveedor, origin):
         """
         Prepara el diccionario de datos para crear la nueva factura
@@ -76,42 +50,61 @@ class PurchaseOrder(models.Model):
        
         }
 
+    
+
     @api.multi
     def write(self, vals):
         context = self._context # para saber que usuario esta en sesion
         current_uid = context.get('uid')
         user = self.env['res.users'].search([('id','=',current_uid)])
         group= self.env['res.groups'].search([('name','=','validacion_director'),('users','=',user.id)]) 
-        #
+        # identifico que usuario esta en sesion y que si ese usuari pertenece al grupo de validacion director
         if vals.get('partner_id') or vals.get('requisition_id'):
             purchase_ids = self.env['purchase.order'].search([('requisition_id', '=', vals.get('requisition_id'))])
             for po_id in purchase_ids:
                 if vals.get('partner_id') == po_id.partner_id.id:
                     raise UserError(_('RFQ is available for this purchase agreement for the same vendor'))
-        print("creando purchase")            
-        purchase_actual=super(PurchaseOrder, self).write(vals)                   
+        print("imprimiendo vals de purchase") 
+        print(vals)
         keys=vals.keys()
         values=vals.values()
         print(keys)
         print(values)
-        if (('state' in keys)& ('purchase' in values)):
-            if(group):                
+        dom=[]
+        if (('state' in keys)& ('purchase' in values)): # pregunto si state esta en lso campos que han cambiado de estod y que si values esta purchase
+
+            if(group): 
+                print("creando purchase")                  
+                vals['invoice_count']=1     # este campo es para que en el modelo de purchase se vea que exist las factura. dado que en este campo lleva el conteo de facturas     
+                purchase_actual=super(PurchaseOrder, self).write(vals) #se crea la purchase order
+                print(vals)               
                 print("la self su estado es =  purchase")
                 factura_obj = self.env['account.invoice']
                 print("factura data")
                 print(self.name)
                 factura_data = self._preparar_factura(self.partner_id.id, self.name)
                 print("hola")
-                factura_crear = factura_obj.create(factura_data)
+                factura_crear = factura_obj.create(factura_data) # se crea la factura
                 print("se creo la factura")
                 for valor in self.order_line:
                     linea_obj = self.env['account.invoice.line']
                     linea_data = self._preparar_linea_factura(factura_crear, valor)
-                    linea_crear = linea_obj.create(linea_data)
+                    linea_crear = linea_obj.create(linea_data) #se crea ñla linea de la factura
                     #return super(PurchaseOrder, self).write(vals)
                 factura_crear.type='in_invoice'
+                print("id de purchase")
+                print(self.id)
+                #print(purchase_actual.id)
+                print(factura_crear.id)
+                factura_crear.purchase_id=self.id
+                print(purchase_actual)
                 return purchase_actual
-        return purchase_actual   #super(PurchaseOrder, self).write(vals)
+            else:
+                print("creando purchase")            
+                purchase_actual=super(PurchaseOrder, self).write(vals)           
+
+                return purchase_actual
+        return super(PurchaseOrder, self).write(vals)
 
     @api.multi
     def compare_purchase_orders(self):
@@ -149,6 +142,3 @@ class PurchaseOrder(models.Model):
             'url':redirect_url
         }
 
-
-
-    # x_status = fields.Char(string='x_status',compute='_cambia_factura')

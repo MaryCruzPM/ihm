@@ -1,0 +1,21 @@
+<!--<?xml version="1.0" encoding="UTF-8"?>  -->
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="categoria_contrato_form">
+            <field name="name">categoria.contrato.form</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="account.view_category_property_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='account_property']" position='before'>
+                    <group>
+                        <group string="Contrato">
+                            <field name="x_contrato"/>
+                            <field name="x_anticipo"/> 
+                            <field name="x_retencion"/> 
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>  
+    </data>
+</odoo>
